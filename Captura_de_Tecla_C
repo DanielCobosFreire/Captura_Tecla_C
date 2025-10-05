@@ -1,0 +1,91 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class TeclaCCaptura extends JFrame {
+    private JList<String> listaElementos;
+    private DefaultListModel<String> modeloLista;
+    private JButton botonEjemplo;
+
+    public TeclaCCaptura() {
+        inicializarComponentes();
+        configurarKeyBindings();
+        configurarVentana();
+    }
+
+    private void inicializarComponentes() {
+        // Crear modelo y lista de elementos
+        modeloLista = new DefaultListModel<>();
+        modeloLista.addElement("Elemento 1");
+        modeloLista.addElement("Elemento 2");
+        modeloLista.addElement("Elemento 3");
+        modeloLista.addElement("Elemento 4");
+        modeloLista.addElement("Elemento 5");
+
+        listaElementos = new JList<>(modeloLista);
+        listaElementos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Crear botón
+        botonEjemplo = new JButton("Botón de Ejemplo");
+        botonEjemplo.addActionListener(e -> {
+            System.out.println("Botón presionado");
+        });
+
+        // Configurar layout
+        setLayout(new BorderLayout());
+        add(new JScrollPane(listaElementos), BorderLayout.CENTER);
+        add(botonEjemplo, BorderLayout.SOUTH);
+    }
+
+    private void configurarKeyBindings() {
+        // Obtener el InputMap y ActionMap de la lista
+        InputMap inputMap = listaElementos.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = listaElementos.getActionMap();
+
+        // Definir la tecla 'C' como trigger
+        KeyStroke teclaC = KeyStroke.getKeyStroke("C");
+        
+        // Crear acción para la tecla C
+        AbstractAction accionTeclaC = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ejecutarAccionTeclaC();
+            }
+        };
+
+        // Registrar el binding
+        inputMap.put(teclaC, "accionTeclaC");
+        actionMap.put("accionTeclaC", accionTeclaC);
+    }
+
+    private void ejecutarAccionTeclaC() {
+        int indiceSeleccionado = listaElementos.getSelectedIndex();
+        
+        if (indiceSeleccionado != -1) {
+            // Alternar el estado del elemento seleccionado
+            String elemento = modeloLista.getElementAt(indiceSeleccionado);
+            if (elemento.endsWith(" [ACTIVO]")) {
+                modeloLista.set(indiceSeleccionado, elemento.replace(" [ACTIVO]", ""));
+                System.out.println("Elemento desactivado: " + elemento.replace(" [ACTIVO]", ""));
+            } else {
+                modeloLista.set(indiceSeleccionado, elemento + " [ACTIVO]");
+                System.out.println("Elemento activado: " + elemento);
+            }
+        } else {
+            System.out.println("Tecla 'C' presionada - No hay elemento seleccionado");
+        }
+    }
+
+    private void configurarVentana() {
+        setTitle("Captura de Tecla C - Key Bindings");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 300);
+        setLocationRelativeTo(null);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new TeclaCCaptura().setVisible(true);
+        });
+    }
+}
